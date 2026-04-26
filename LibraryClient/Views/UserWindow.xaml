@@ -1,0 +1,198 @@
+<Window x:Class="LibraryClient.Views.UserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Пользователь — Библиотека" Height="680" Width="960"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E2E">
+
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="7,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#2A2A3E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555577"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <Grid>
+                                <ScrollViewer x:Name="PART_ContentHost" Margin="7,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="Ph" Text="{TemplateBinding Tag}"
+                                           Foreground="#666699" FontSize="12"
+                                           Margin="9,0,0,0" VerticalAlignment="Center"
+                                           IsHitTestVisible="False" Visibility="Collapsed"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Text" Value=""/>
+                                    <Condition Property="IsKeyboardFocused" Value="False"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Ph" Property="Visibility" Value="Visible"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="#2E86AB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.82"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="#2A2A3E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#444466"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#333355"/>
+            <Setter Property="RowBackground" Value="#2A2A3E"/>
+            <Setter Property="AlternatingRowBackground" Value="#252538"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="ColumnHeaderHeight" Value="36"/>
+            <Setter Property="RowHeight" Value="30"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#1A1A2E"/>
+            <Setter Property="Foreground" Value="#AAB4C8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="10,0"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#3A4A6A"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="160"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="📖  Каталог книг"
+                   FontSize="22" FontWeight="Bold"
+                   Foreground="White" Margin="0,0,0,12"/>
+
+        <!-- Top bar -->
+        <Border Grid.Row="1" Background="#252538" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Ваш ID читателя:" Foreground="#AAB4C8" FontSize="13"
+                           VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox x:Name="ReaderIdBox" Width="110" Margin="0,0,14,0" Tag="Введите ID (пр.: 1)"/>
+                <Button Content="🔄  Обновить" Click="LoadBooks_Click" Margin="0,0,8,0"/>
+                <Button Content="📋  Мои выдачи" Background="#6A3D9A" Click="LoadMyLoans_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Books table -->
+        <DataGrid Grid.Row="2" x:Name="BooksGrid" Margin="0,0,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID"       Binding="{Binding Id}"             Width="55"/>
+                <DataGridTextColumn Header="Название" Binding="{Binding Title}"           Width="*"/>
+                <DataGridTextColumn Header="Автор"    Binding="{Binding Author}"          Width="175"/>
+                <DataGridTextColumn Header="Жанр"     Binding="{Binding Genre}"           Width="175"/>
+                <DataGridTextColumn Header="Доступно" Binding="{Binding AvailableCopies}" Width="85"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Action panel -->
+        <Border Grid.Row="3" Background="#252538" CornerRadius="8" Padding="14,12" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Loan -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="📥  Взять книгу" Foreground="#7EB8D4"
+                               FontWeight="Bold" FontSize="13" Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="BookIdBox" Width="140" Margin="0,0,10,0"
+                                 Tag="ID книги из таблицы выше"/>
+                        <Button Content="📥  Взять" Background="#27AE60" Click="Loan_Click"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Divider -->
+                <Rectangle Grid.Column="1" Width="1" Fill="#444466" Margin="0,4"/>
+
+                <!-- Return -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="📤  Вернуть книгу" Foreground="#7EB8D4"
+                               FontWeight="Bold" FontSize="13" Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="LoanIdBox" Width="140" Margin="0,0,10,0"
+                                 Tag="ID выдачи из таблицы ниже"/>
+                        <Button Content="📤  Вернуть" Background="#E67E22" Click="Return_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- My loans header -->
+        <TextBlock Grid.Row="4" Text="📋  Мои выдачи"
+                   FontSize="15" FontWeight="Bold"
+                   Foreground="#7EB8D4" Margin="0,0,0,6"/>
+
+        <!-- My loans table -->
+        <DataGrid Grid.Row="5" x:Name="MyLoansGrid">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID выдачи"  Binding="{Binding Id}"                                  Width="80"/>
+                <DataGridTextColumn Header="Книга"      Binding="{Binding BookTitle}"                            Width="*"/>
+                <DataGridTextColumn Header="Выдана"     Binding="{Binding LoanDate, StringFormat=dd.MM.yyyy}"   Width="90"/>
+                <DataGridTextColumn Header="Срок до"    Binding="{Binding DueDate, StringFormat=dd.MM.yyyy}"    Width="90"/>
+                <DataGridTextColumn Header="Возвращена" Binding="{Binding ReturnDate, StringFormat=dd.MM.yyyy}" Width="105"/>
+                <DataGridTextColumn Header="Статус"     Binding="{Binding Status}"                              Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>
