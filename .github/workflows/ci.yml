@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore LibraryApi
+        run: dotnet restore LibraryApi/LibraryApi.csproj
+
+      - name: Build LibraryApi
+        run: dotnet build LibraryApi/LibraryApi.csproj --no-restore -c Release
+
+      - name: Restore LibraryConsoleClient
+        run: dotnet restore LibraryConsoleClient/LibraryConsoleClient.csproj
+
+      - name: Build LibraryConsoleClient
+        run: dotnet build LibraryConsoleClient/LibraryConsoleClient.csproj --no-restore -c Release
