@@ -6,7 +6,7 @@
 
 ## 🗂 Структура репозитория
 
-<img width="412" height="409" alt="image" src="https://github.com/user-attachments/assets/1f53c3ac-5137-433d-bf6a-224f3ad0ae41" />
+![Music](https://284baef4-3d14-4ca5-8247-4811f0d6b14b.selstorage.ru/d13d5483-522f-40ca-8d49-07d096e34f3f_f0f21383-40fb-4d13-a2b5-ce81b242f788.png)
 
 
 ---
@@ -148,36 +148,8 @@ docker compose down -v
 
 ## 🏗 Архитектура
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                 Docker Compose network                  │
-│                                                         │
-│  Клиент (WPF / Console / Browser)                      │
-│          │                                              │
-│          ▼  HTTP :80                                    │
-│  ┌──────────────────┐                                   │
-│  │   Nginx (:80)    │  /api/  /swagger  /metrics        │
-│  └────────┬─────────┘                                   │
-│           │  proxy_pass → api:8080                      │
-│           ▼                                             │
-│  ┌──────────────────────────────────────────┐           │
-│  │       ASP.NET Core REST API (:8080)      │           │
-│  │  BooksController  ReadersController      │           │
-│  │  BookLoansController                     │           │
-│  └────────┬─────────────────────┬───────────┘           │
-│           │ GET → cache         │ EF Core               │
-│           ▼                     ▼                       │
-│  ┌────────────────┐   ┌──────────────────┐              │
-│  │  Redis (:6379) │   │ PostgreSQL (:5432)│              │
-│  │  TTL 30 с      │   │  librarydb        │              │
-│  └────────────────┘   └──────────────────┘              │
-│                                                         │
-│  Prometheus (:9090)  ←── scrape /metrics каждые 10 с   │
-│       │                                                 │
-│       ▼                                                 │
-│  Grafana (:3000)                                        │
-└─────────────────────────────────────────────────────────┘
-```
+<img width="406" height="407" alt="image" src="https://github.com/user-attachments/assets/f99dadf6-3f90-449e-8406-aeb5ef45d349" />
+
 
 **Кэширование**: `GET /api/books` проверяет ключ `"books"` в Redis. При cache miss записывает результат с TTL 30 сек. Мутирующие операции (`POST`/`PUT`/`DELETE`) вызывают `KeyDeleteAsync` для инвалидации. Все обращения к Redis обёрнуты в `try/catch` — при недоступности Redis API продолжает работу через БД.
 
